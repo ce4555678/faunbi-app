@@ -5,6 +5,7 @@ import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import NextTopLoader from "nextjs-toploader";
+import { ViewTransitions } from "next-view-transitions";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -60,17 +61,19 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${openSans.className} antialiased`}>
-        <NuqsAdapter>
-          <Providers>
-            {children}
-            {modal}
-          </Providers>
-        </NuqsAdapter>
-        <NextTopLoader color="#6f57b3" />
-        <Toaster richColors />
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="pt-BR">
+        <body className={`${openSans.className} antialiased`}>
+          <NuqsAdapter>
+            <Providers>
+              {children}
+              {modal}
+            </Providers>
+          </NuqsAdapter>
+          <NextTopLoader color="#6f57b3" />
+          <Toaster richColors />
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

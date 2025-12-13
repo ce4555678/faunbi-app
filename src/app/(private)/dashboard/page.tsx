@@ -3,5 +3,5 @@ export const metadata = {
 };
 
 export default function Dashboard() {
-  return <>Oi</>;
+  return <div className="mx-auto container p-4">Oi</div>;
 }

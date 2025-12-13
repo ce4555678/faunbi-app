@@ -9,9 +9,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Upload } from "lucide-react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Link } from "next-view-transitions";
 
 export function NavMain({
   items,

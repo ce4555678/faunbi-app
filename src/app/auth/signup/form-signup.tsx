@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/logo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
@@ -24,6 +23,7 @@ import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
+import { Link } from "next-view-transitions";
 
 const formSchema = z
   .object({

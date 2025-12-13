@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 import { NavMenu } from "@/components/nav-menu";
 import { NavigationSheet } from "@/components/navigation-sheet";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 const Navbar = () => {
   return (

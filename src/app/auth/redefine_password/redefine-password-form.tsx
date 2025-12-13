@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRef, useState } from "react";
@@ -23,6 +22,7 @@ import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
+import { Link } from "next-view-transitions";
 
 const formSchema = z
   .object({

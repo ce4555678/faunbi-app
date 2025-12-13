@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -24,6 +23,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { $session } from "@/store/session.store";
 import { redirect } from "next/navigation";
 import { useStore } from "@nanostores/react";
+import { Link } from "next-view-transitions";
 
 const formSchema = z.object({
   email: z.email("Email inválido").max(100, "Email muito grande"),

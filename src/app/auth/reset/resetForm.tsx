@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/logo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRef, useState } from "react";
@@ -21,6 +20,7 @@ import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
+import { Link } from "next-view-transitions";
 
 const formSchema = z.object({
   email: z.email("Email inválido").max(100, "Email muito grande"),

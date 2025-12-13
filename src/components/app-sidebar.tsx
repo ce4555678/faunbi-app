@@ -15,8 +15,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "./logo";
-import Link from "next/link";
 import { Suspense } from "react";
+import { Link } from "next-view-transitions";
 
 const data = {
   navMain: [
