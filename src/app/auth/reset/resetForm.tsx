@@ -48,9 +48,12 @@ const ResetPasswordForm = () => {
       return;
     }
 
-    const { data: response, error } = await authClient.requestPasswordReset({
+    const { error } = await authClient.requestPasswordReset({
       email: data.email, // required
-      redirectTo: "http://localhost:3000/auth/redefine_password",
+      redirectTo:
+        process.env.NEXT_PUBLIC_VERCEL_ENV == ""
+          ? "https://www.faunbi.com/auth/redefine_password"
+          : "http://localhost:3000/auth/redefine_password",
       fetchOptions: {
         headers: {
           "x-captcha-response": token,
