@@ -1,6 +1,8 @@
-import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { eq, relations, sql } from "drizzle-orm";
+import { pgTable, text, timestamp, boolean, index, bigint, jsonb, pgView } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid"
 
+const genId = () => nanoid()
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
@@ -58,8 +60,91 @@ export const verification = pgTable(
     (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+type Status = "pending" | "completed" | "failed";
+
+export const projeto = pgTable(
+    "projeto",
+    {
+        id: text("id").$default(genId).primaryKey(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        title: text().notNull(),
+        summary: text(),
+        thumb: text(),
+        status: text("status").$type<Status>().default("pending"),
+        language_default: text().default("en"),
+        duration: bigint({ mode: "number" }),
+        subtitle: jsonb().$type<
+            {
+                default: boolean;
+                language: string;
+                url: string;
+            }[]
+        >(),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at")
+            .defaultNow()
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+        topics: jsonb().$type<
+            {
+                thumb: string;
+                start: number;
+                end: number;
+                duration: number;
+                url: string;
+                title: string;
+            }[]
+        >(),
+        file: jsonb().$type<{
+            type: "video";
+            url: string;
+            size: number;
+            duration: number;
+        }>(),
+        upload: text()
+    },
+    (table) => [
+        index("transcription_userId_idx").on(table.userId),
+    ]
+);
+
+export const projetosProcessadosDurationView = pgView(
+    "projetos_processados_duration_view"
+).as((qb) =>
+    qb
+        .select({
+            quantidade: sql<number>`count(*)`.as("quantidade"),
+            total: sql<number>`sum(${projeto.duration})`.as("total"),
+            userId: projeto.userId,
+        })
+        .from(projeto)
+        .where(eq(projeto.status, "completed"))
+        .groupBy(projeto.userId)
+);
+
+export const projetosPendentesView = pgView("projetos_pendentes_view").as((qb) => qb.select({
+    // 1. Usar COUNT(*) para contar todas as linhas (projetos)
+    total: sql<number>`count(*)`.as("total"),
+    userId: projeto.userId,
+})
+    .from(projeto)
+    // 2. A condição WHERE filtra apenas os projetos pendentes
+    .where(eq(projeto.status, "pending"))
+    .groupBy(projeto.userId)
+);
+
+export const projetoRelations = relations(projeto, ({ one }) => ({
+    user: one(user, {
+        fields: [projeto.userId],
+        references: [user.id],
+    }),
+}));
+
 export const userRelations = relations(user, ({ many }) => ({
     accounts: many(account),
+    projetos: many(projeto)
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({

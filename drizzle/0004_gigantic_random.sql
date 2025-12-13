@@ -1,0 +1,2 @@
+CREATE VIEW "public"."projetos_pendentes_view" AS (select count(*) as "total", "user_id" from "projeto" where "projeto"."status" = 'pending' group by "projeto"."user_id");--> statement-breakpoint
+CREATE VIEW "public"."projetos_processados_duration_view" AS (select count(*) as "quantidade", sum("duration") as "total", "user_id" from "projeto" where "projeto"."status" = 'completed' group by "projeto"."user_id");
