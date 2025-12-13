@@ -1,5 +1,5 @@
 import { eq, relations, sql } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, bigint, jsonb, pgView } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, bigint, jsonb, pgView, integer } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid"
 
 const genId = () => nanoid()
@@ -108,6 +108,39 @@ export const projeto = pgTable(
     (table) => [
         index("transcription_userId_idx").on(table.userId),
     ]
+);
+
+export const balance = pgTable(
+    "balance",
+    {
+        id: integer().primaryKey().generatedAlwaysAsIdentity(),
+        balance: integer(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" })
+            .unique(),
+        createdAt: timestamp("created_at").defaultNow(),
+        updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
+    },
+    (table) => [index("userIdBalanceIndex").on(table.userId)]
+);
+
+type TypeTransaction = "entrada" | "api" | "transcription";
+
+export const transaction = pgTable(
+    "transaction",
+    {
+        id: bigint({ mode: "bigint" }).primaryKey().generatedAlwaysAsIdentity(),
+        value: integer().notNull(),
+        type: text().$type<TypeTransaction>().notNull(),
+        title: text(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        createdAt: timestamp("created_at").defaultNow(),
+        updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
+    },
+    (table) => [index("userIdTransactionIndex").on(table.userId)]
 );
 
 export const projetosProcessadosDurationView = pgView(

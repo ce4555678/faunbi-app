@@ -1,0 +1,20 @@
+# Use a imagem oficial do Meilisearch como base.
+# A tag v1.16 corresponde à versão que você especificou no seu comando `docker run`.
+FROM getmeili/meilisearch:v1.16
+
+# O Meilisearch usa a porta 7700 por padrão.
+# A instrução EXPOSE documenta qual porta o contêiner está configurado para ouvir.
+# (Apesar de não publicar a porta no host, é uma boa prática documentar.)
+EXPOSE 7700
+
+# Defina o diretório de trabalho padrão dentro do contêiner.
+# O Meilisearch armazena seus dados em /meili_data por padrão.
+WORKDIR /meili_data
+
+# Se você precisar executar o Meilisearch com opções específicas, 
+# você pode redefinir o ponto de entrada (ENTRYPOINT) e/ou o comando (CMD).
+# No entanto, a imagem oficial já tem um ENTRYPOINT e CMD configurados 
+# para iniciar o Meilisearch, então geralmente não são necessários.
+# Por exemplo, se quisesse definir uma chave mestra:
+# ENV MEILI_MASTER_KEY="seu_segredo_aqui"
+# CMD ["meilisearch"]
