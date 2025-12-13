@@ -77,7 +77,7 @@ const SignupForm = () => {
       email: data.email,
       password: data.password,
       name: data.name,
-      callbackURL: "/dashboard#new",
+      callbackURL: "/dashboard",
       fetchOptions: {
         headers: {
           "x-captcha-response": token,

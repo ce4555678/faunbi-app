@@ -5,7 +5,6 @@ import {
   Button,
   Container,
   Head,
-  Hr,
   Html,
   Img,
   Link,

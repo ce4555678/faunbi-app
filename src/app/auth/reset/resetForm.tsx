@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   email: z.email("Email inválido").max(100, "Email muito grande"),
@@ -256,7 +257,13 @@ const ResetPasswordForm = () => {
                 }}
               />
               <Button type="submit" className="w-full">
-                Enviar
+                {loading ? (
+                  <>
+                    <Spinner /> Enviar
+                  </>
+                ) : (
+                  "Enviar"
+                )}
               </Button>
             </div>
           </Form>

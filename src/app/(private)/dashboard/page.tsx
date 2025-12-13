@@ -1,7 +1,7 @@
 export const metadata = {
-  title: "Dashboard",
+  title: "Painel",
 };
 
-export default function DashboardPage() {
-  return <div>Dashboard</div>;
+export default function Dashboard() {
+  return <>Oi</>;
 }

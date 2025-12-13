@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import NextTopLoader from "nextjs-toploader";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -53,15 +54,21 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="pt-BR">
       <body className={`${openSans.className} antialiased`}>
         <NuqsAdapter>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            {modal}
+          </Providers>
         </NuqsAdapter>
+        <NextTopLoader color="#6f57b3" />
         <Toaster richColors />
       </body>
     </html>
