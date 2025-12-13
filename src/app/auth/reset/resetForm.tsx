@@ -51,7 +51,7 @@ const ResetPasswordForm = () => {
     const { error } = await authClient.requestPasswordReset({
       email: data.email, // required
       redirectTo:
-        process.env.NEXT_PUBLIC_VERCEL_ENV == ""
+        process.env.NEXT_PUBLIC_VERCEL_ENV == "production"
           ? "https://www.faunbi.com/auth/redefine_password"
           : "http://localhost:3000/auth/redefine_password",
       fetchOptions: {
