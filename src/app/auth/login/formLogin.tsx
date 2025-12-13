@@ -17,10 +17,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
-import { useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
+import { $session } from "@/store/session.store";
+import { redirect } from "next/navigation";
+import { useStore } from "@nanostores/react";
 
 const formSchema = z.object({
   email: z.email("Email inválido").max(100, "Email muito grande"),
@@ -30,6 +33,15 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
+  const session = useStore($session);
+  const isAuthenticated = useEffectEvent(() => {
+    if (session.status == "authenticated") redirect("/dashboard");
+  });
+
+  useEffect(() => {
+    isAuthenticated();
+  }, [session]);
+
   const [loading, setLoading] = useState<boolean>(false);
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({

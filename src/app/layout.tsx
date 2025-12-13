@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -58,7 +59,9 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${openSans.className} antialiased`}>
-        <Providers>{children}</Providers>
+        <NuqsAdapter>
+          <Providers>{children}</Providers>
+        </NuqsAdapter>
         <Toaster richColors />
       </body>
     </html>

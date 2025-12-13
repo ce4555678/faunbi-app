@@ -1,16 +1,34 @@
 import db from "@/db";
 import redis from "@/db/redis";
-import { betterAuth, BASE_ERROR_CODES } from "better-auth";
+import { emailResetPasswordTask } from "@/trigger/email-reset-password";
+import { emailVerifySendTask } from "@/trigger/email-verify";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin, captcha, } from "better-auth/plugins";
+import { admin, captcha } from "better-auth/plugins";
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg", // or "mysql", "sqlite"
     }),
     emailAndPassword: {
-        enabled: true
+        enabled: true,
+        sendResetPassword: async ({ user, url }) => {
+            await emailResetPasswordTask.trigger({
+                email: user.email,
+                url: url,
+            });
+        },
+    },
+    emailVerification: {
+        sendOnSignUp: true,
+        sendVerificationEmail: async ({ user, url }) => {
+            await emailVerifySendTask.trigger({
+                email: user.email,
+                name: user.name,
+                verificationLink: url,
+            });
+        },
     },
     socialProviders: {
         google: {
@@ -18,11 +36,13 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
     },
-    plugins: [admin(), nextCookies(),
-    captcha({
-        provider: "cloudflare-turnstile",
-        secretKey: process.env.TURNSTILE_SECRET_KEY!,
-    }),
+    plugins: [
+        admin(),
+        nextCookies(),
+        captcha({
+            provider: "cloudflare-turnstile",
+            secretKey: process.env.TURNSTILE_SECRET_KEY!,
+        }),
     ],
     secondaryStorage: {
         get: async (key: string) => {

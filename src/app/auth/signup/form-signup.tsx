@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
 
 const formSchema = z
   .object({
@@ -46,6 +48,7 @@ const formSchema = z
   });
 
 const SignupForm = () => {
+  const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,11 +73,11 @@ const SignupForm = () => {
       return;
     }
 
-    const { error } = await authClient.signUp.email({
+    const { error, data: response } = await authClient.signUp.email({
       email: data.email,
       password: data.password,
       name: data.name,
-      callbackURL: "/dashboard",
+      callbackURL: "/dashboard#new",
       fetchOptions: {
         headers: {
           "x-captcha-response": token,
@@ -86,9 +89,17 @@ const SignupForm = () => {
       const msg = BASE_ERROR_CODES[error.code as keyof typeof BASE_ERROR_CODES];
       toast.error(msg);
       turnstileRef.current?.reset();
-      setLoading(false);
       form.reset();
-      return;
+    }
+
+    if (response?.user) {
+      toast.success("E-mail enviado!", {
+        description: "Verifique sua caixa de email",
+      });
+
+      turnstileRef.current?.reset();
+      form.reset();
+      setSuccess(true);
     }
 
     setLoading(false);
@@ -150,6 +161,16 @@ const SignupForm = () => {
           <p className="mt-4 text-xl font-semibold tracking-tight">
             Criar uma nova conta
           </p>
+
+          {success && (
+            <Alert variant={"default"} className="my-4 text-green-700">
+              <CheckCircle2Icon />
+              <AlertTitle>E-mail enviado!</AlertTitle>
+              <AlertDescription className="text-green-800">
+                Verifique sua caixa de email
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Form {...form}>
             <form
@@ -247,6 +268,8 @@ const SignupForm = () => {
                         <Link
                           href="/termos"
                           className="underline text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                          passHref
+                          target="_blank"
                         >
                           termos
                         </Link>{" "}
@@ -254,6 +277,8 @@ const SignupForm = () => {
                         <Link
                           href="/privacidade"
                           className="underline text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                          passHref
+                          target="_blank"
                         >
                           privacidade
                         </Link>

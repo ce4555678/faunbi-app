@@ -20,39 +20,56 @@ import { toast } from "sonner";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
+import { Spinner } from "@/components/ui/spinner";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 
-const formSchema = z.object({
-  email: z.email("Email inválido").max(100, "Email muito grande"),
-});
+const formSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Senha deve ter pelo menos 8 caracteres")
+      .max(100, "Senha muito grande"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não correspondem",
+    path: ["confirmPassword"],
+  });
 
-const ResetPasswordForm = () => {
+const NewPasswordForm = () => {
+  const [token] = useQueryState("token", parseAsString.withDefault(""));
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      email: "",
+      password: "",
+      confirmPassword: "",
     },
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const token = turnstileRef.current?.getResponse();
+    setLoading(true);
+    const isToken = turnstileRef.current?.getResponse();
 
-    if (!token) {
+    if (!isToken) {
       toast.error("Por favor, complete a verificação do Turnstile.");
       setLoading(false);
-
       return;
     }
 
-    const { data: response, error } = await authClient.requestPasswordReset({
-      email: data.email, // required
-      redirectTo: "http://localhost:3000/auth/redefine_password",
+    // Você pode ajustar este endpoint conforme necessário
+    const { error } = await authClient.resetPassword({
+      newPassword: data.password,
+      token: token,
       fetchOptions: {
         headers: {
-          "x-captcha-response": token,
+          "x-captcha-response": isToken,
         },
       },
     });
@@ -62,12 +79,10 @@ const ResetPasswordForm = () => {
       toast.error(msg);
       turnstileRef.current?.reset();
       setLoading(false);
-      form.reset();
       return;
     }
 
     setLoading(false);
-
     setIsSubmitted(true);
   };
 
@@ -140,11 +155,11 @@ const ResetPasswordForm = () => {
               </svg>
             </div>
             <p className="text-xl font-semibold tracking-tight">
-              Email enviado!
+              Senha redefinida!
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Verifique sua caixa de entrada para obter instruções de
-              redefinição de senha.
+              Sua senha foi alterada com sucesso. Você pode agora fazer login
+              com sua nova senha.
             </p>
 
             <Link href="/auth/login" className="mt-6 w-full">
@@ -210,35 +225,83 @@ const ResetPasswordForm = () => {
         <div className="relative isolate flex flex-col items-center">
           <Logo />
           <p className="mt-4 text-xl font-semibold tracking-tight">
-            Redefinir senha
+            Definir nova senha
           </p>
           <p className="mt-2 text-sm text-muted-foreground text-center">
-            Digite seu email e enviaremos instruções para redefinir sua senha.
+            Digite sua nova senha e confirme para continuar.
           </p>
 
           <Form {...form}>
-            <div
+            <form
               className="w-full space-y-6 mt-6"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Nova Senha</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="seu.email@exemplo.com"
-                        className="w-full"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Sua nova senha"
+                          className="w-full pr-10"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showPassword ? (
+                            <EyeOffIcon className="size-5" />
+                          ) : (
+                            <EyeIcon className="size-5" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirmar Senha</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirme sua senha"
+                          className="w-full pr-10"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOffIcon className="size-5" />
+                          ) : (
+                            <EyeIcon className="size-5" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Turnstile
                 ref={turnstileRef}
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string}
@@ -255,10 +318,17 @@ const ResetPasswordForm = () => {
                   turnstileRef.current?.reset();
                 }}
               />
-              <Button type="submit" className="w-full">
-                Enviar
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Spinner /> Salvando...
+                  </>
+                ) : (
+                  "Salvar Nova Senha"
+                )}
               </Button>
-            </div>
+            </form>
           </Form>
 
           <div className="mt-5 space-y-3">
@@ -268,15 +338,6 @@ const ResetPasswordForm = () => {
             >
               Voltar para login
             </Link>
-            <p className="text-sm text-center">
-              Não tem uma conta?
-              <Link
-                href="/auth/signup"
-                className="ml-1 underline text-muted-foreground"
-              >
-                Criar uma conta
-              </Link>
-            </p>
           </div>
         </div>
       </div>
@@ -284,4 +345,4 @@ const ResetPasswordForm = () => {
   );
 };
 
-export default ResetPasswordForm;
+export default NewPasswordForm;
