@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "next-view-transitions";
 
 export default function CtaHomeUi() {
   return (
@@ -12,9 +13,11 @@ export default function CtaHomeUi() {
           Comece agora. Sem cartão de crédito. Sem compromisso. Apenas você e
           suas horas de volta.
         </p>
-        <button className="px-8 py-4 bg-white hover:bg-gray-100 text-violet-600 rounded-lg font-semibold transition transform hover:scale-105 inline-flex items-center gap-2 shadow-lg">
-          Começar Minha Jornada <ArrowRight size={20} />
-        </button>
+        <Link href={"/auth/signup"}>
+          <button className="px-8 py-4 bg-white hover:bg-gray-100 text-violet-600 rounded-lg font-semibold transition transform hover:scale-105 inline-flex items-center gap-2 shadow-lg">
+            Começar Minha Jornada <ArrowRight size={20} />
+          </button>
+        </Link>
       </div>
     </section>
   );

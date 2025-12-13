@@ -1,5 +1,5 @@
 import { Sparkles, Search } from "lucide-react";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 export default function HeroHomeUi() {
   return (
@@ -26,7 +26,7 @@ export default function HeroHomeUi() {
         </p>
 
         <div className="flex items-center justify-center mb-12">
-          <Link href={"/auth/login"}>
+          <Link href={"/auth/signup"}>
             <button className="px-8 py-4 bg-linear-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white rounded-lg font-semibold transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
               <Sparkles /> Começar grátis
             </button>

@@ -13,6 +13,7 @@ export const emailVerifySendTask = schemaTask({
         name: z.string(),
         verificationLink: z.url()
     }),
+    machine: "micro",
     // Set an optional maxDuration to prevent tasks from running indefinitely
     maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute
     run: async (payload, { ctx }) => {

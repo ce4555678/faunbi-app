@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { memo, useEffect, useEffectEvent, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
 import { Spinner } from "@/components/ui/spinner";
@@ -171,11 +171,11 @@ const LoginForm = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Senha</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Senha"
                         className="w-full"
                         {...field}
                       />
@@ -235,4 +235,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default memo(LoginForm);
