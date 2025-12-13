@@ -16,7 +16,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
-import { Activity, memo, useRef, useState } from "react";
+import {
+  Activity,
+  memo,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { BASE_ERROR_CODES } from "@/utils/error_codes_auth";
@@ -24,6 +31,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 import { Link } from "next-view-transitions";
+import { useStore } from "@nanostores/react";
+import { $session } from "@/store/session.store";
+import { redirect } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -48,6 +58,7 @@ const formSchema = z
   });
 
 const SignupForm = () => {
+  const session = useStore($session);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const turnstileRef = useRef<TurnstileInstance | null>(null);
@@ -61,6 +72,14 @@ const SignupForm = () => {
     },
     resolver: zodResolver(formSchema),
   });
+
+  const isAuthenticated = useEffectEvent(() => {
+    if (session.status == "authenticated") redirect("/dashboard");
+  });
+
+  useEffect(() => {
+    isAuthenticated();
+  }, [session]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setLoading(true);
