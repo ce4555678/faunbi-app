@@ -11,6 +11,8 @@ export default async function HiDashboard() {
   });
   const firstName = session?.user?.name.split(" ").slice(0, 1);
   return (
-    <h1 className="text-3xl font-bold tracking-tight">Olá, {firstName}! 👋</h1>
+    <h1 className="text-3xl font-bold tracking-tight capitalize">
+      Olá, {firstName?.toLocaleString()}! 👋
+    </h1>
   );
 }
