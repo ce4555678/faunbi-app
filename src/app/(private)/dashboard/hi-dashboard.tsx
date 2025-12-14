@@ -1,7 +1,11 @@
 import { auth } from "@/lib/auth";
+import { cacheLife, cacheTag } from "next/cache";
 import { headers } from "next/headers";
 
 export default async function HiDashboard() {
+  "use cache: private";
+  cacheLife("days");
+  cacheTag("hiDashboard");
   const session = await auth.api.getSession({
     headers: await headers(),
   });
