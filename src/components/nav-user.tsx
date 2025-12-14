@@ -61,7 +61,10 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium capitalize">
-                    {session.user?.name}
+                    {session?.user?.name
+                      .split(" ")
+                      .slice(0, 1)[0]
+                      .toLocaleLowerCase()}
                   </span>
                   <span className="text-muted-foreground truncate text-xs">
                     {session.user?.email}
@@ -90,7 +93,7 @@ export function NavUser() {
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium capitalize">
-                      {session.user?.name}
+                      {session?.user?.name.toLocaleLowerCase()}
                     </span>
                     <span className="text-muted-foreground truncate text-xs">
                       {session.user?.email}
