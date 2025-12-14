@@ -1,5 +1,5 @@
 import { eq, relations, sql } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, bigint, jsonb, pgView, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, bigint, jsonb, pgView, integer, numeric } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid"
 
 const genId = () => nanoid()
@@ -89,7 +89,6 @@ export const projeto = pgTable(
             .notNull(),
         topics: jsonb().$type<
             {
-                thumb: string;
                 start: number;
                 end: number;
                 duration: number;
@@ -114,7 +113,8 @@ export const balance = pgTable(
     "balance",
     {
         id: integer().primaryKey().generatedAlwaysAsIdentity(),
-        balance: integer(),
+        balance: numeric({ precision: 10, scale: 2 }),
+        credits: integer(),
         userId: text("user_id")
             .notNull()
             .references(() => user.id, { onDelete: "cascade" })
@@ -125,13 +125,13 @@ export const balance = pgTable(
     (table) => [index("userIdBalanceIndex").on(table.userId)]
 );
 
-type TypeTransaction = "entrada" | "api" | "transcription";
+type TypeTransaction = "api" | "transcription";
 
 export const transaction = pgTable(
     "transaction",
     {
         id: bigint({ mode: "bigint" }).primaryKey().generatedAlwaysAsIdentity(),
-        value: integer().notNull(),
+        value: numeric({ precision: 10, scale: 2 }).notNull(),
         type: text().$type<TypeTransaction>().notNull(),
         title: text(),
         userId: text("user_id")
@@ -167,6 +167,20 @@ export const projetosPendentesView = pgView("projetos_pendentes_view").as((qb) =
     .where(eq(projeto.status, "pending"))
     .groupBy(projeto.userId)
 );
+
+export const transactionRelations = relations(transaction, ({ one }) => ({
+    user: one(user, {
+        fields: [transaction.userId],
+        references: [user.id],
+    }),
+}));
+
+export const balanceRelations = relations(balance, ({ one }) => ({
+    user: one(user, {
+        fields: [balance.userId],
+        references: [user.id],
+    }),
+}));
 
 export const projetoRelations = relations(projeto, ({ one }) => ({
     user: one(user, {

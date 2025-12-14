@@ -36,6 +36,20 @@
       "when": 1765651379698,
       "tag": "0004_gigantic_random",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1765658354714,
+      "tag": "0005_groovy_ultragirl",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1765658675683,
+      "tag": "0006_mature_millenium_guard",
+      "breakpoints": true
     }
   ]
 }
